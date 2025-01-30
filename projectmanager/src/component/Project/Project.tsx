@@ -7,9 +7,11 @@ import { Link } from 'react-router-dom';
 // 간소화된 프로젝트 타입 정의
 interface Project {
   id: number;
-  project: string;
+  projectName: string;
   description: string;
   isPrivate: boolean;
+  date: string;
+  projectCreator: string;
 }
 
 const DashboardContainer = styled.div`
@@ -37,6 +39,7 @@ const ProjectGrid = styled.div`
 `;
 
 const ProjectCard = styled.div`
+  position: relative; // 삭제 버튼 위치를 위해 추가
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
@@ -45,6 +48,28 @@ const ProjectCard = styled.div`
 
   &:hover {
     transform: translateY(-5px);
+  }
+`;
+
+const DeleteButton = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
+
+  ${ProjectCard}:hover & {
+    opacity: 1;
   }
 `;
 
@@ -84,7 +109,7 @@ const Dashboard: React.FC = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await Axiosbase.get('/api/project/read/project');
+      const response = await Axiosbase.get<Project[]>('/api/project/read/project');
       setProjects(response.data);
       setLoading(false);
     } catch (err) {
@@ -92,7 +117,24 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+  const handleDelete = async (projectId: number, e: React.MouseEvent) => {
+    e.preventDefault(); // Link 이벤트 방지
 
+    if (window.confirm('이 프로젝트를 삭제하면 관련된 모든 문서도 함께 삭제됩니다. 계속하시겠습니까?')) {
+      try {
+        // 먼저 프로젝트의 모든 문서 삭제
+        
+        // 그 다음 프로젝트 삭제
+        await Axiosbase.post(`/api/project/delete/${projectId}`);
+
+        setProjects(projects.filter(project => project.id !== projectId));
+        alert('프로젝트가 성공적으로 삭제되었습니다.');
+      } catch (err) {
+        console.error('프로젝트 삭제 실패:', err);
+        alert('프로젝트 삭제에 실패했습니다. 관련 문서가 있는지 확인해주세요.');
+      }
+    }
+  };
   if (loading) {
     return <div>로딩중...</div>;
   }
@@ -105,18 +147,28 @@ const Dashboard: React.FC = () => {
     <DashboardContainer>
       <Header>
         <h1>프로젝트 현황</h1>
-        <Link to="/createProject"><button>새 프로젝트 생성</button></Link>
+        <Link to="/createProject">
+          <button>새 프로젝트 생성</button>
+        </Link>
         <button><Logout /></button>
       </Header>
       <ProjectGrid>
         {projects.map((project) => (
-         <Link to="/projectdetail"><ProjectCard key={project.id}>
-            <ProjectTitle>{project.project}</ProjectTitle>
-            <ProjectDescription>{project.description}</ProjectDescription>
-            <PrivacyBadge isPrivate={project.isPrivate}>
-              {project.isPrivate ? '비공개' : '공개'}
-            </PrivacyBadge>
-          </ProjectCard></Link>
+          <Link to={`/projectdetail/${project.id}`} key={project.id}>
+            <ProjectCard>
+              <DeleteButton
+                onClick={(e) => handleDelete(project.id, e)}
+                aria-label="프로젝트 삭제"
+              >
+                삭제
+              </DeleteButton>
+              <ProjectTitle>{project.projectName}</ProjectTitle>
+              <ProjectDescription>{project.description}</ProjectDescription>
+              <PrivacyBadge isPrivate={project.isPrivate}>
+                {project.isPrivate ? '비공개' : '공개'}
+              </PrivacyBadge>
+            </ProjectCard>
+          </Link>
         ))}
       </ProjectGrid>
     </DashboardContainer>
