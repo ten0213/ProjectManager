@@ -12,14 +12,18 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <div>
-        <Routes>
-  <Route path="/" element={<Login />} />
-  <Route path="/signup" element={<Signup />} />
-  <Route path="/project" element={<Project />} />
-  <Route path="/createproject" element={<CreateProject />} />
-  <Route path="/projectdetail/:id" element={<ProjectDetail />} />
-  <Route path="/document/create/:id" element={<CreateDocument />} /> {/* 경로 수정 */}
-</Routes>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/project" element={<Project />} />
+            <Route path="/createproject" element={<CreateProject />} />
+            <Route path="/projectdetail/:id" element={<ProjectDetail />} />
+            <Route
+              path="/document/create/:id"
+              element={<CreateDocument />}
+            />{" "}
+            {/* 경로 수정 */}
+          </Routes>
         </div>
       </BrowserRouter>
     </AuthProvider>

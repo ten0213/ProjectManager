@@ -152,92 +152,68 @@ const CreateDocument: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const [previousDocument, setPreviousDocument] = useState<DocumentRequest | null>(null);
-  // 초기 상태 수정
+  const [previousDocument, setPreviousDocument] =
+    useState<DocumentRequest | null>(null);
   const [formData, setFormData] = useState<DocumentRequest>({
     date: new Date().toISOString(),
     projectId: 0,
-    endpoints: [{
-      path: '',
-      method: '',
-      parameters: [{
-        annotation: '',
-        type: '',
-        data: ''
-      }]
-    }]
+    endpoints: [
+      {
+        path: "",
+        method: "",
+        parameters: [
+          {
+            annotation: "",
+            type: "",
+            data: "",
+          },
+        ],
+      },
+    ],
   });
 
-  // useEffect 수정
   useEffect(() => {
-    if (!id) {
-      console.error('No project ID in URL');
-      setError('프로젝트 ID가 필요합니다.');
-      return;
-    }
+    const fetchLastDocument = async () => {
+      try {
+        if (!id) {
+          setError("프로젝트 ID가 필요합니다.");
+          return;
+        }
 
-    const projectId = parseInt(id);
-    if (isNaN(projectId)) {
-      console.error('Invalid project ID:', id);
-      setError('유효하지 않은 프로젝트 ID입니다.');
-      return;
-    }
+        const projectId = parseInt(id);
+        if (isNaN(projectId)) {
+          setError("유효하지 않은 프로젝트 ID입니다.");
+          return;
+        }
 
-    console.log('Setting project ID:', projectId);
-    setFormData(prev => ({
-      ...prev,
-      projectId: projectId
-    }));
-  }, [id]);
+        setFormData((prev) => ({ ...prev, projectId }));
 
-  const fetchLastDocument = async () => {
-    try {
-      const response = await Axiosbase.get(`/api/document/read/exDocumentData`);
-      setPreviousDocument(response.data);
+        const response = await Axiosbase.get("/api/document/read/exDocumentData");
+        const previousDoc = response.data;
 
-    // 이전 문서 데이터를 formData에 설정
-    if(response.data) {
-      setFormData(prev => ({
-        ...prev,
-        endpoints: response.data.endpoints.map(endpoint => ({
-          path: endpoint.path,
-          method: endpoint.method,
-          parameters: endpoint.parameters.map(param => ({
-            annotation: param.annotation,
-            type: param.type,
-            data: param.data
-          }))
-        }))
-      }));
-    }
-  } catch (err) {
-    console.log('이전 문서가 없거나 불러오기 실패');
-  }
-};
+        if (previousDoc) {
+          setPreviousDocument(previousDoc);
+          setFormData((prev) => ({
+            ...prev,
+            endpoints: previousDoc.endpoints.map((endpoint) => ({
+              path: endpoint.path || "",
+              method: endpoint.method || "",
+              parameters: endpoint.parameters.map((param) => ({
+                annotation: param.annotation || "",
+                type: param.type || "",
+                data: param.data || "",
+              })),
+            })),
+          }));
+        }
+      } catch {
+        setPreviousDocument(null);
+      }
+    };
 
-  useEffect(() => {
-    if (!id) {
-      console.error('No project ID in URL');
-      setError('프로젝트 ID가 필요합니다.');
-      return;
-    }
-
-    const projectId = parseInt(id);
-    if (isNaN(projectId)) {
-      console.error('Invalid project ID:', id);
-      setError('유효하지 않은 프로젝트 ID입니다.');
-      return;
-    }
-
-    console.log('Setting project ID:', projectId);
-    setFormData(prev => ({
-      ...prev,
-      projectId: projectId
-    }));
-
-    // 이전 문서 데이터 불러오기
     fetchLastDocument();
   }, [id]);
+
   const handleEndpointChange = (
     index: number,
     field: keyof EndpointRequest,
@@ -292,27 +268,27 @@ const CreateDocument: React.FC = () => {
     }));
   };
 
-  const addParameter = (endpointIndex: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      endpoints: prev.endpoints.map((endpoint, i) =>
-        i === endpointIndex
-          ? {
-              ...endpoint,
-              parameters: [
-                ...endpoint.parameters,
-                {
-                  annotation: "",
-                  type: "",
-                  data: "",
-                },
-              ],
-            }
-          : endpoint
-      ),
-    }));
-  };
+  const addParameter = (currentEndpointIndex: number) => {
+    setFormData((prevFormData) => {
+      const updatedEndpoints = prevFormData.endpoints.map((endpoint, index) => {
+        if (index === currentEndpointIndex) {
+          return {
+            ...endpoint,
+            parameters: [
+              ...endpoint.parameters,
+              { annotation: "", type: "", data: "" },
+            ],
+          };
+        }
+        return endpoint;
+      });
 
+      return {
+        ...prevFormData,
+        endpoints: updatedEndpoints,
+      };
+    });
+  };
   const removeEndpoint = (index: number) => {
     if (formData.endpoints.length > 1) {
       setFormData((prev) => ({
@@ -340,119 +316,148 @@ const CreateDocument: React.FC = () => {
     }
   };
 
-  // handleSubmit 수정
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (!formData.projectId) {
-        setError('프로젝트 ID가 필요합니다.');
+        setError("프로젝트 ID가 필요합니다.");
         return;
       }
 
       const requestData: DocumentRequest = {
         date: formData.date,
         projectId: formData.projectId,
-        endpoints: formData.endpoints.map(endpoint => ({
-          path: endpoint.path || '',
-          method: endpoint.method || '',
-          parameters: endpoint.parameters.map(param => ({
-            annotation: param.annotation || '',
-            type: param.type || '',
-            data: param.data || ''
-          }))
-        }))
+        endpoints: formData.endpoints.map((endpoint) => ({
+          path: endpoint.path || "",
+          method: endpoint.method || "",
+          parameters: endpoint.parameters.map((param) => ({
+            annotation: param.annotation || "",
+            type: param.type || "",
+            data: param.data || "",
+          })),
+        })),
       };
 
-      console.log('Submitting request with projectId:', formData.projectId);
-      console.log('Request Data:', JSON.stringify(requestData, null, 2));
+      console.log("Submitting request with projectId:", formData.projectId);
+      console.log("Request Data:", JSON.stringify(requestData, null, 2));
 
-      const response = await Axiosbase.post('/api/document/create', requestData);
-      navigate(`/projectdetail/${formData.projectId}`);
+      const response = await Axiosbase.post(
+        "/api/document/create",
+        requestData
+      );
+      const $id = localStorage.getItem('id');
+      window.location.href = `/projectdetail/${$id}`;
     } catch (err: any) {
-      console.error('Error:', err);
-      setError(err.response?.data?.message || 'API 문서 생성에 실패했습니다.');
+      console.error("Error:", err);
+      setError(err.response?.data?.message || "API 문서 생성에 실패했습니다.");
     }
   };
 
   const handleCancel = () => {
-    navigate(-1);
+    navigate(`/projectdetail/${formData.projectId}`);
   };
 
   return (
     <FormContainer>
       {formData.endpoints.map((endpoint, endpointIndex) => (
-  <EndpointContainer key={endpointIndex}>
-    <FormGroup>
-      <Label>HTTP Method</Label>
-      <Input
-        type="text"
-        placeholder={previousDocument?.endpoints[endpointIndex]?.method || endpoint.method}
-        onChange={(e) =>
-          handleEndpointChange(endpointIndex, "method", e.target.value)
-        }
-      />
-    </FormGroup>
+        <EndpointContainer key={endpointIndex}>
+          <FormGroup>
+            <Label>HTTP Method</Label>
+            <Input
+              type="text"
+              placeholder={
+                previousDocument?.endpoints?.[endpointIndex]?.method ||
+                endpoint.method ||
+                ""
+              }
+              onChange={(e) =>
+                handleEndpointChange(endpointIndex, "method", e.target.value)
+              }
+            />
+          </FormGroup>
 
-    <FormGroup>
-      <Label>Path</Label>
-      <Input
-        type="text"
-        placeholder={previousDocument?.endpoints[endpointIndex]?.path || endpoint.path}
-        onChange={(e) =>
-          handleEndpointChange(endpointIndex, "path", e.target.value)
-        }
-      />
-    </FormGroup>
+          <FormGroup>
+            <Label>Path</Label>
+            <Input
+              type="text"
+              placeholder={
+                previousDocument?.endpoints?.[endpointIndex]?.path ||
+                endpoint.path ||
+                ""
+              }
+              onChange={(e) =>
+                handleEndpointChange(endpointIndex, "path", e.target.value)
+              }
+            />
+          </FormGroup>
 
-    {endpoint.parameters.map((param, paramIndex) => (
-      <ParameterContainer key={paramIndex}>
-        <FormGroup>
-          <Label>Annotation</Label>
-          <Input
-            type="text"
-            placeholder={previousDocument?.endpoints[endpointIndex]?.parameters[paramIndex]?.annotation || param.annotation}
-            onChange={(e) =>
-              handleParameterChange(
-                endpointIndex,
-                paramIndex,
-                "annotation",
-                e.target.value
-              )
-            }
-          />
-        </FormGroup>
+          {endpoint.parameters.map((param, paramIndex) => (
+            <ParameterContainer key={paramIndex}>
+              <FormGroup>
+                <Label>Annotation</Label>
+                <Input
+                  type="text"
+                  placeholder={
+                    previousDocument?.endpoints?.[endpointIndex]?.parameters?.[
+                      paramIndex
+                    ]?.annotation ||
+                    param.annotation ||
+                    ""
+                  }
+                  onChange={(e) =>
+                    handleParameterChange(
+                      endpointIndex,
+                      paramIndex,
+                      "annotation",
+                      e.target.value
+                    )
+                  }
+                />
+              </FormGroup>
 
-        <FormGroup>
-          <Label>Parameter Type</Label>
-          <Input
-            type="text"
-            placeholder={previousDocument?.endpoints[endpointIndex]?.parameters[paramIndex]?.type || param.type}
-            onChange={(e) =>
-              handleParameterChange(
-                endpointIndex,
-                paramIndex,
-                "type",
-                e.target.value
-              )
-            }
-          />
-        </FormGroup>
+              <FormGroup>
+                <Label>Parameter Type</Label>
+                <Input
+                  type="text"
+                  placeholder={
+                    previousDocument?.endpoints?.[endpointIndex]?.parameters?.[
+                      paramIndex
+                    ]?.type ||
+                    param.type ||
+                    ""
+                  }
+                  onChange={(e) =>
+                    handleParameterChange(
+                      endpointIndex,
+                      paramIndex,
+                      "type",
+                      e.target.value
+                    )
+                  }
+                />
+              </FormGroup>
 
-        <FormGroup>
-          <Label>Parameter Data</Label>
-          <Input
-            type="text"
-            placeholder={previousDocument?.endpoints[endpointIndex]?.parameters[paramIndex]?.data || param.data}
-            onChange={(e) =>
-              handleParameterChange(
-                endpointIndex,
-                paramIndex,
-                "data",
-                e.target.value
-              )
-            }
-          />
-        </FormGroup>
+              <FormGroup>
+                <Label>Parameter Data</Label>
+                <Input
+                  type="text"
+                  placeholder={
+                    previousDocument?.endpoints?.[endpointIndex]?.parameters?.[
+                      paramIndex
+                    ]?.data ||
+                    param.data ||
+                    ""
+                  }
+                  onChange={(e) =>
+                    handleParameterChange(
+                      endpointIndex,
+                      paramIndex,
+                      "data",
+                      e.target.value
+                    )
+                  }
+                />
+              </FormGroup>
 
               <ActionButton
                 type="button"

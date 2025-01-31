@@ -160,16 +160,12 @@ const ParameterItem = styled.div`
   color: #666;
 `;
 interface PrivacyBadgeProps {
-  isPrivate: boolean;
+  $isPrivate: boolean;
 }
 
 const PrivacyBadge = styled.span<PrivacyBadgeProps>`
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  background-color: ${({ isPrivate }) => isPrivate ? '#fff3e0' : '#e8f5e9'};
-  color: ${({ isPrivate }) => isPrivate ? '#f57c00' : '#388e3c'};
+  background-color: ${({ $isPrivate }) => $isPrivate ? '#fff3e0' : '#e8f5e9'};
+  color: ${({ $isPrivate }) => $isPrivate ? '#f57c00' : '#388e3c'};
 `;
 
 const ButtonGroup = styled.div`
@@ -215,7 +211,7 @@ const Button = styled.button`
 `;
 
 const ProjectDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  var { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -223,6 +219,7 @@ const ProjectDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+
     Promise.all([
       fetchProjectDetail(),
       fetchDocuments()
@@ -231,6 +228,7 @@ const ProjectDetail: React.FC = () => {
 
   const fetchProjectDetail = async () => {
     try {
+
       const response = await Axiosbase.get(`/api/project/read/${id}`);
       setProject(response.data);
     } catch (err) {
@@ -250,7 +248,7 @@ const ProjectDetail: React.FC = () => {
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>{error}</div>;
   if (!project) return <div>프로젝트를 찾을 수 없습니다.</div>;
-
+  localStorage.setItem('id', `${id}`);
   return (
     <DetailContainer>
       <Header>
@@ -258,7 +256,7 @@ const ProjectDetail: React.FC = () => {
       </Header>
       <DetailCard>
         <ProjectTitle>{project.projectName}</ProjectTitle>
-        <PrivacyBadge isPrivate={project.isPrivate}>
+        <PrivacyBadge $isPrivate={project.isPrivate}>
           {project.isPrivate ? '비공개' : '공개'}
         </PrivacyBadge>
        <ProjectDescription> <br />프로젝트 설명:{project.description}</ProjectDescription>
