@@ -123,9 +123,9 @@ const Dashboard: React.FC = () => {
     if (window.confirm('이 프로젝트를 삭제하면 관련된 모든 문서도 함께 삭제됩니다. 계속하시겠습니까?')) {
       try {
         // 먼저 프로젝트의 모든 문서 삭제
-        
+
         // 그 다음 프로젝트 삭제
-        await Axiosbase.post(`/api/project/delete/${projectId}`);
+        await Axiosbase.post(`api/project/delete/${projectId}`);
 
         setProjects(projects.filter(project => project.id !== projectId));
         alert('프로젝트가 성공적으로 삭제되었습니다.');

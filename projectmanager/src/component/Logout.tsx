@@ -30,7 +30,7 @@ const Logout: React.FC = () => {
     try {
         if(window.confirm("로그아웃 하시겠습니까?") === true){
 
-        
+
 
             await Axiosbase.post('api/auth/logout', {}, {
                 headers: {
@@ -60,9 +60,7 @@ const Logout: React.FC = () => {
   };
 
   return (
-    <LogoutButton onClick={handleLogout}>
-      로그아웃
-    </LogoutButton>
+    <button onClick={handleLogout}>로그아웃</button>
   );
 };
 
