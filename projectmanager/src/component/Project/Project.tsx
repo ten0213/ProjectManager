@@ -4,7 +4,6 @@ import Axiosbase from '../../Axiosbase.tsx';
 import Logout from '../Logout.tsx';
 import { Link } from 'react-router-dom';
 
-// 간소화된 프로젝트 타입 정의
 interface Project {
   id: number;
   projectName: string;
@@ -39,7 +38,7 @@ const ProjectGrid = styled.div`
 `;
 
 const ProjectCard = styled.div`
-  position: relative; // 삭제 버튼 위치를 위해 추가
+  position: relative;
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
@@ -117,40 +116,35 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
   const handleDelete = async (projectId: number, e: React.MouseEvent) => {
-    e.preventDefault(); // Link 이벤트 방지
+    e.preventDefault();
 
     if (window.confirm('이 프로젝트를 삭제하면 관련된 모든 문서도 함께 삭제됩니다. 계속하시겠습니까?')) {
       try {
-        // 먼저 프로젝트의 모든 문서 삭제
-
-        // 그 다음 프로젝트 삭제
         await Axiosbase.post(`api/project/delete/${projectId}`);
-
         setProjects(projects.filter(project => project.id !== projectId));
         alert('프로젝트가 성공적으로 삭제되었습니다.');
       } catch (err) {
         console.error('프로젝트 삭제 실패:', err);
-        alert('프로젝트 삭제에 실패했습니다. 관련 문서가 있는지 확인해주세요.');
+        alert('프로젝트 삭제에 실패했습니다.');
       }
     }
   };
-  if (loading) {
-    return <div>로딩중...</div>;
-  }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  if (loading) return <div>로딩중...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <DashboardContainer>
       <Header>
-        <h1>프로젝트 현황</h1>
-        <Link to="/createProject">
-          <button>새 프로젝트 생성</button>
-        </Link>
-        <button><Logout /></button>
+        <h1>내 프로젝트</h1>
+        <div>
+          <Link to="/createProject">
+            <button>새 프로젝트 생성</button>
+          </Link>
+          <button><Logout /></button>
+        </div>
       </Header>
       <ProjectGrid>
         {projects.map((project) => (
