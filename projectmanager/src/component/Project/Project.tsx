@@ -139,11 +139,23 @@ const Dashboard: React.FC = () => {
 
 
   const fetchProjects = async () => {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      setError('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
     try {
-      const response = await Axiosbase.get<Project[]>('/api/project/read/project');
+      const response = await Axiosbase.get<Project[]>('/api/project/read/project', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setProjects(response.data);
       setLoading(false);
     } catch (err) {
+      console.error('프로젝트 로딩 에러:', err);
       setError('프로젝트 목록을 불러오는데 실패했습니다.');
       setLoading(false);
     }
@@ -152,9 +164,20 @@ const Dashboard: React.FC = () => {
   const handleDelete = async (projectId: number, e: React.MouseEvent) => {
     e.preventDefault();
 
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      setError('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
     if (window.confirm('이 프로젝트를 삭제하면 관련된 모든 문서도 함께 삭제됩니다. 계속하시겠습니까?')) {
       try {
-        await Axiosbase.post(`api/project/delete/${projectId}`);
+        await Axiosbase.post(`api/project/delete/${projectId}`, {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setProjects(projects.filter(project => project.id !== projectId));
         alert('프로젝트가 성공적으로 삭제되었습니다.');
       } catch (err) {

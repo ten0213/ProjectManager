@@ -119,22 +119,27 @@ const CreateProject: React.FC = () => {
       return;
     }
 
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      setError('로그인이 필요합니다.');
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError('');
 
-      const response = await Axiosbase.post('/api/project/create', projectInput, {
+      await Axiosbase.post('/api/project/create', projectInput, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${localStorage.getItem('token')}`
-
+          'Authorization': `Bearer ${token}`
         },
       });
 
-      // 프로젝트 생성 성공 시 프로젝트 목록 페이지로 이동
       navigate('/project');
 
     } catch (error: any) {
+      console.error('Error creating project:', error);
       setError(error.response?.data?.message || '프로젝트 생성 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);

@@ -345,7 +345,7 @@ const CreateDocument: React.FC = () => {
         "/api/document/create",
         requestData
       );
-      const $id = localStorage.getItem('id');
+      const $id = sessionStorage.getItem('id');
       window.location.href = `/projectdetail/${$id}`;
     } catch (err: any) {
       console.error("Error:", err);

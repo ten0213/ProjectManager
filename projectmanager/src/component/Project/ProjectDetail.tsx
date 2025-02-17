@@ -350,12 +350,12 @@ const [isInviting, setIsInviting] = useState(false);
     }
   };
 
-  const userId = localStorage.getItem('userId') || '';
+  const userId = sessionStorage.getItem('userId') || '';
 
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>{error}</div>;
   if (!project) return <div>프로젝트를 찾을 수 없습니다.</div>;
-  localStorage.setItem('id', `${id}`);
+  sessionStorage.setItem('id', `${id}`);
   return (
     <PageContainer>
     <Header userId={userId} />
