@@ -418,66 +418,67 @@ const ProjectDetail: React.FC = () => {
             </InviteSection>
           )}
 
-          <Link to={`/document/${userId}`}>
+
             {" "}
             <DocumentSection>
               <SectionTitle>API 문서 목록</SectionTitle>
               {documents.length > 0 ? (
-                documents.map((doc, index) => (
-                  <DocumentCard key={doc.id || index}>
-                    <DateBadge>
-                      작성일:{" "}
-                      {new Date(doc.date).toLocaleDateString("ko-KR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </DateBadge>
-                    {doc.endpoints.map((endpoint, endpointIndex) => (
-                      <EndpointInfo key={endpointIndex}>
-                        <div>
-                          <MethodBadge method={endpoint.method}>
-                            {endpoint.method.toUpperCase()}
-                          </MethodBadge>
-                          <PathText>{endpoint.path}</PathText>
-                        </div>
-                        <ParameterList>
-                          {endpoint.parameters.map((param, paramIndex) => (
-                            <ParameterItem key={paramIndex}>
-                              <span style={{ fontWeight: 500 }}>
-                                {param.annotation}
-                              </span>{" "}
-                              <br />
-                              type:{" "}
-                              <span style={{ color: "#6c757d" }}>
-                                {param.type}
-                              </span>
-                              <br />
-                              data: <span>{param.data}</span>
-                            </ParameterItem>
-                          ))}
-                        </ParameterList>
-                      </EndpointInfo>
-                    ))}
-                  </DocumentCard>
-                ))
-              ) : (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "2rem",
-                    color: "#6c757d",
-                  }}
-                >
-                  등록된 API 문서가 없습니다.
-                  <p style={{ marginTop: "0.5rem", fontSize: "0.9rem" }}>
-                    상단의 'API 작성' 버튼을 클릭하여 새로운 API 문서를
-                    작성해보세요.
-                  </p>
-                </div>
-              )}
+  documents.map((doc, index) => (
+    <Link to={`/document/${doc.id}`} key={doc.id || index} style={{ textDecoration: 'none' }}>
+      <DocumentCard>
+        <DateBadge>
+          작성일:{" "}
+          {new Date(doc.date).toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </DateBadge>
+        {doc.endpoints.map((endpoint, endpointIndex) => (
+          <EndpointInfo key={endpointIndex}>
+            <div>
+              <MethodBadge method={endpoint.method}>
+                {endpoint.method.toUpperCase()}
+              </MethodBadge>
+              <PathText>{endpoint.path}</PathText>
+            </div>
+            <ParameterList>
+              {endpoint.parameters.map((param, paramIndex) => (
+                <ParameterItem key={paramIndex}>
+                  <span style={{ fontWeight: 500 }}>
+                    {param.annotation}
+                  </span>{" "}
+                  <br />
+                  type:{" "}
+                  <span style={{ color: "#6c757d" }}>
+                    {param.type}
+                  </span>
+                  <br />
+                  data: <span>{param.data}</span>
+                </ParameterItem>
+              ))}
+            </ParameterList>
+          </EndpointInfo>
+        ))}
+      </DocumentCard>
+    </Link>
+  ))
+) : (
+  <div
+    style={{
+      textAlign: "center",
+      padding: "2rem",
+      color: "#6c757d",
+    }}
+  >
+    등록된 API 문서가 없습니다.
+    <p style={{ marginTop: "0.5rem", fontSize: "0.9rem" }}>
+      상단의 'API 작성' 버튼을 클릭하여 새로운 API 문서를 작성해보세요.
+    </p>
+  </div>
+)}
             </DocumentSection>
-          </Link>
+
 
           <ButtonGroup>
             <Button
