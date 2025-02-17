@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return localStorage.getItem('signId') !== null;
+    return sessionStorage.getItem('signId') !== null;
   });
 
   const login = () => {
@@ -22,13 +22,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    localStorage.removeItem('signId'); // signId 제거
+   sessionStorage.removeItem('signId'); // signId 제거
     setIsLoggedIn(false);
   };
 
   useEffect(() => {
     // localStorage의 signId 존재 여부로 로그인 상태 확인
-    const signId = localStorage.getItem('signId');
+    const signId = sessionStorage.getItem('signId');
     setIsLoggedIn(!!signId);
   }, []);
 

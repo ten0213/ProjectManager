@@ -7,6 +7,7 @@ import Project from "./component/Project/Project.tsx";
 import CreateProject from "./component/Project/CreateProject.tsx";
 import ProjectDetail from "./component/Project/ProjectDetail.tsx";
 import CreateDocument from "./component/Document/CreateDocument.tsx";
+import DocumentDetail from "./component/Document/DocumentDetail.tsx";
 function App() {
   return (
     <AuthProvider>
@@ -23,6 +24,7 @@ function App() {
               element={<CreateDocument />}
             />{" "}
             {/* 경로 수정 */}
+            <Route path="/document/:id" element={<DocumentDetail />} />
           </Routes>
         </div>
       </BrowserRouter>

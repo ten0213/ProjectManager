@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import Axiosbase from '../../Axiosbase.tsx';
-import Header from '../Header.tsx';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import styled from "styled-components";
+import Axiosbase from "../../Axiosbase.tsx";
+import Header from "../Header.tsx";
 const InviteSection = styled.div`
   margin-top: 2rem;
   padding: 1.5rem;
@@ -26,7 +26,6 @@ const PageContainer = styled.div`
   min-height: 100vh;
 `;
 
-
 const InviteButton = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -47,16 +46,15 @@ const InviteButton = styled.button`
   }
 `;
 
-const MessageBox = styled.div<{ $type: 'success' | 'error' }>`
+const MessageBox = styled.div<{ $type: "success" | "error" }>`
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 4px;
   background-color: ${({ $type }) =>
-    $type === 'success' ? '#e8f5e9' : '#ffebee'};
-  color: ${({ $type }) =>
-    $type === 'success' ? '#2e7d32' : '#c62828'};
-  border: 1px solid ${({ $type }) =>
-    $type === 'success' ? '#a5d6a7' : '#ffcdd2'};
+    $type === "success" ? "#e8f5e9" : "#ffebee"};
+  color: ${({ $type }) => ($type === "success" ? "#2e7d32" : "#c62828")};
+  border: 1px solid
+    ${({ $type }) => ($type === "success" ? "#a5d6a7" : "#ffcdd2")};
 `;
 
 interface Project {
@@ -65,7 +63,6 @@ interface Project {
   description: string;
   isPrivate: boolean;
   projectName: string;
-
 }
 
 interface MethodBadgeProps {
@@ -89,7 +86,6 @@ interface Parameter {
   type: string;
   data: string;
 }
-
 
 const DetailContainer = styled.div`
   padding: 2rem;
@@ -117,7 +113,7 @@ const SectionTitle = styled.h3`
   gap: 0.5rem;
 
   &::before {
-    content: '';
+    content: "";
     display: inline-block;
     width: 4px;
     height: 24px;
@@ -190,11 +186,16 @@ const MethodBadge = styled.span<MethodBadgeProps>`
   margin-right: 1rem;
   background-color: ${({ method }) => {
     switch (method.toUpperCase()) {
-      case 'GET': return '#4caf50';
-      case 'POST': return '#2196f3';
-      case 'PUT': return '#ff9800';
-      case 'DELETE': return '#f44336';
-      default: return '#757575';
+      case "GET":
+        return "#4caf50";
+      case "POST":
+        return "#2196f3";
+      case "PUT":
+        return "#ff9800";
+      case "DELETE":
+        return "#f44336";
+      default:
+        return "#757575";
     }
   }};
   color: white;
@@ -220,8 +221,8 @@ interface PrivacyBadgeProps {
 }
 
 const PrivacyBadge = styled.span<PrivacyBadgeProps>`
-  background-color: ${({ $isPrivate }) => $isPrivate ? '#fff3e0' : '#e8f5e9'};
-  color: ${({ $isPrivate }) => $isPrivate ? '#f57c00' : '#388e3c'};
+  background-color: ${({ $isPrivate }) => ($isPrivate ? "#fff3e0" : "#e8f5e9")};
+  color: ${({ $isPrivate }) => ($isPrivate ? "#f57c00" : "#388e3c")};
 `;
 
 const ButtonGroup = styled.div`
@@ -273,38 +274,40 @@ const ProjectDetail: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-// 초대 관련 상태 추가
-const [showInvite, setShowInvite] = useState(false);
-const [username, setUsername] = useState('');
-const [inviteMessage, setInviteMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-const [isInviting, setIsInviting] = useState(false);
+  // 초대 관련 상태 추가
+  const [showInvite, setShowInvite] = useState(false);
+  const [username, setUsername] = useState("");
+  const [inviteMessage, setInviteMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
 
   useEffect(() => {
-
-    Promise.all([
-      fetchProjectDetail(),
-      fetchDocuments()
-    ]).finally(() => setLoading(false));
+    Promise.all([fetchProjectDetail(), fetchDocuments()]).finally(() =>
+      setLoading(false)
+    );
   }, [id]);
 
   const fetchProjectDetail = async () => {
     try {
-
       const response = await Axiosbase.get(`/api/project/read/${id}`);
       setProject(response.data);
     } catch (err) {
-      setError('프로젝트 정보를 불러오는데 실패했습니다.');
+      setError("프로젝트 정보를 불러오는데 실패했습니다.");
     }
   };
   const handleInvite = async () => {
     if (!username.trim()) {
-      setInviteMessage({ type: 'error', text: '사용자 이름을 입력해주세요.' });
+      setInviteMessage({ type: "error", text: "사용자 이름을 입력해주세요." });
       return;
     }
 
     setIsInviting(true);
     try {
-      const checkResponse = await Axiosbase.post(`/api/project/read/${id}/invitations`);
+      const checkResponse = await Axiosbase.post(
+        `/api/project/read/${id}/invitations`
+      );
 
       if (checkResponse.status === 202) {
         const inviteResponse = await Axiosbase.post(
@@ -313,17 +316,29 @@ const [isInviting, setIsInviting] = useState(false);
         );
 
         if (inviteResponse.status === 202) {
-          setInviteMessage({ type: 'success', text: '사용자를 성공적으로 초대했습니다.' });
-          setUsername('');
+          setInviteMessage({
+            type: "success",
+            text: "사용자를 성공적으로 초대했습니다.",
+          });
+          setUsername("");
         }
       }
     } catch (error: any) {
       if (error.response?.status === 403) {
-        setInviteMessage({ type: 'error', text: '프로젝트 초대 권한이 없습니다.' });
+        setInviteMessage({
+          type: "error",
+          text: "프로젝트 초대 권한이 없습니다.",
+        });
       } else if (error.response?.status === 404) {
-        setInviteMessage({ type: 'error', text: '존재하지 않는 사용자입니다.' });
+        setInviteMessage({
+          type: "error",
+          text: "존재하지 않는 사용자입니다.",
+        });
       } else {
-        setInviteMessage({ type: 'error', text: '초대 중 오류가 발생했습니다.' });
+        setInviteMessage({
+          type: "error",
+          text: "초대 중 오류가 발생했습니다.",
+        });
       }
     } finally {
       setIsInviting(false);
@@ -337,129 +352,146 @@ const [isInviting, setIsInviting] = useState(false);
       const response = await Axiosbase.get(`/api/document/project/${id}`);
       if (response.data) {
         // 날짜 기준으로 내림차순 정렬 (최신 문서가 위로)
-        const sortedDocuments = response.data.sort((a: Document, b: Document) =>
-          new Date(b.date).getTime() - new Date(a.date).getTime()
+        const sortedDocuments = response.data.sort(
+          (a: Document, b: Document) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
         );
         setDocuments(sortedDocuments);
       } else {
         setDocuments([]);
       }
     } catch (err) {
-      console.error('문서 로드 에러:', err);
-      setError('문서 목록을 불러오는데 실패했습니다.');
+      console.error("문서 로드 에러:", err);
+      setError("문서 목록을 불러오는데 실패했습니다.");
     }
   };
 
-  const userId = sessionStorage.getItem('userId') || '';
+  const userId = sessionStorage.getItem("userId") || "";
 
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>{error}</div>;
   if (!project) return <div>프로젝트를 찾을 수 없습니다.</div>;
-  sessionStorage.setItem('id', `${id}`);
+  sessionStorage.setItem("id", `${id}`);
   return (
     <PageContainer>
-    <Header userId={userId} />
-    <DetailContainer>
-      <Headerr>
-        <h1>Document</h1>
-      </Headerr>
-      <DetailCard>
-        <ProjectTitle>{project.projectName}</ProjectTitle>
-        <PrivacyBadge $isPrivate={project.isPrivate}>
-          {project.isPrivate ? '비공개' : '공개'}
-        </PrivacyBadge>
-       <ProjectDescription> <br />프로젝트 설명:{project.description}</ProjectDescription>
-       <ButtonGroup>
-          <Button
-            className="edit"
-            onClick={() => setShowInvite(!showInvite)}>
-            {showInvite ? '초대 닫기' : '사용자 초대'}
-          </Button>
-        </ButtonGroup>
+      <Header userId={userId} />
+      <DetailContainer>
+        <Headerr>
+          <h1>Document</h1>
+        </Headerr>
+        <DetailCard>
+          <ProjectTitle>{project.projectName}</ProjectTitle>
+          <PrivacyBadge $isPrivate={project.isPrivate}>
+            {project.isPrivate ? "비공개" : "공개"}
+          </PrivacyBadge>
+          <ProjectDescription>
+            {" "}
+            <br />
+            프로젝트 설명:{project.description}
+          </ProjectDescription>
+          <ButtonGroup>
+            <Button className="edit" onClick={() => setShowInvite(!showInvite)}>
+              {showInvite ? "초대 닫기" : "사용자 초대"}
+            </Button>
+          </ButtonGroup>
 
-        {showInvite && (
-          <InviteSection>
-            <SectionTitle>사용자 초대</SectionTitle>
-            <div>
-              <InviteInput
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="초대할 사용자 이름 입력"
-                disabled={isInviting}
-              />
-              <InviteButton
-                onClick={handleInvite}
-                disabled={isInviting}
-              >
-                {isInviting ? '초대 중...' : '초대하기'}
-              </InviteButton>
-            </div>
-            {inviteMessage && (
-              <MessageBox $type={inviteMessage.type}>
-                {inviteMessage.text}
-              </MessageBox>
-            )}
-          </InviteSection>
-        )}
+          {showInvite && (
+            <InviteSection>
+              <SectionTitle>사용자 초대</SectionTitle>
+              <div>
+                <InviteInput
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="초대할 사용자 이름 입력"
+                  disabled={isInviting}
+                />
+                <InviteButton onClick={handleInvite} disabled={isInviting}>
+                  {isInviting ? "초대 중..." : "초대하기"}
+                </InviteButton>
+              </div>
+              {inviteMessage && (
+                <MessageBox $type={inviteMessage.type}>
+                  {inviteMessage.text}
+                </MessageBox>
+              )}
+            </InviteSection>
+          )}
 
+          <Link to={`/document/${userId}`}>
+            {" "}
+            <DocumentSection>
+              <SectionTitle>API 문서 목록</SectionTitle>
+              {documents.length > 0 ? (
+                documents.map((doc, index) => (
+                  <DocumentCard key={doc.id || index}>
+                    <DateBadge>
+                      작성일:{" "}
+                      {new Date(doc.date).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </DateBadge>
+                    {doc.endpoints.map((endpoint, endpointIndex) => (
+                      <EndpointInfo key={endpointIndex}>
+                        <div>
+                          <MethodBadge method={endpoint.method}>
+                            {endpoint.method.toUpperCase()}
+                          </MethodBadge>
+                          <PathText>{endpoint.path}</PathText>
+                        </div>
+                        <ParameterList>
+                          {endpoint.parameters.map((param, paramIndex) => (
+                            <ParameterItem key={paramIndex}>
+                              <span style={{ fontWeight: 500 }}>
+                                {param.annotation}
+                              </span>{" "}
+                              <br />
+                              type:{" "}
+                              <span style={{ color: "#6c757d" }}>
+                                {param.type}
+                              </span>
+                              <br />
+                              data: <span>{param.data}</span>
+                            </ParameterItem>
+                          ))}
+                        </ParameterList>
+                      </EndpointInfo>
+                    ))}
+                  </DocumentCard>
+                ))
+              ) : (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "2rem",
+                    color: "#6c757d",
+                  }}
+                >
+                  등록된 API 문서가 없습니다.
+                  <p style={{ marginTop: "0.5rem", fontSize: "0.9rem" }}>
+                    상단의 'API 작성' 버튼을 클릭하여 새로운 API 문서를
+                    작성해보세요.
+                  </p>
+                </div>
+              )}
+            </DocumentSection>
+          </Link>
 
-
-        <DocumentSection>
-  <SectionTitle>API 문서 목록</SectionTitle>
-  {documents.length > 0 ? (
-    documents.map((doc, index) => (
-      <DocumentCard key={doc.id || index}>
-        <DateBadge>
-          작성일: {new Date(doc.date).toLocaleDateString('ko-KR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </DateBadge>
-        {doc.endpoints.map((endpoint, endpointIndex) => (
-          <EndpointInfo key={endpointIndex}>
-            <div>
-              <MethodBadge method={endpoint.method}>
-                {endpoint.method.toUpperCase()}
-              </MethodBadge>
-              <PathText>{endpoint.path}</PathText>
-            </div>
-            <ParameterList>
-              {endpoint.parameters.map((param, paramIndex) => (
-                <ParameterItem key={paramIndex}>
-                  <span style={{ fontWeight: 500 }}>{param.annotation}</span> <br />
-                type:  <span style={{ color: '#6c757d' }}>{param.type}</span><br />
-              data:    <span>{param.data}</span>
-                </ParameterItem>
-              ))}
-            </ParameterList>
-          </EndpointInfo>
-        ))}
-      </DocumentCard>
-    ))
-  ) : (
-    <div style={{ textAlign: 'center', padding: '2rem', color: '#6c757d' }}>
-      등록된 API 문서가 없습니다.
-      <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
-        상단의 'API 작성' 버튼을 클릭하여 새로운 API 문서를 작성해보세요.
-      </p>
-    </div>
-  )}
-</DocumentSection>
-
-        <ButtonGroup>
-          <Button
-            className="edit"
-            onClick={() => navigate(`/document/create/${id}`)}>
-            API 작성
-          </Button>
-          <Button className="back" onClick={() => navigate("/project")}>
-            뒤로
-          </Button>
-        </ButtonGroup>
-      </DetailCard>
-    </DetailContainer>
+          <ButtonGroup>
+            <Button
+              className="edit"
+              onClick={() => navigate(`/document/create/${id}`)}
+            >
+              API 작성
+            </Button>
+            <Button className="back" onClick={() => navigate("/project")}>
+              뒤로
+            </Button>
+          </ButtonGroup>
+        </DetailCard>
+      </DetailContainer>
     </PageContainer>
   );
 };

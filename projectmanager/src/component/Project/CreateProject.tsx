@@ -106,6 +106,7 @@ const CreateProject: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
   const [projectInput, setProjectInput] = useState<ProjectInput>({
     projectName: '',
     description: '',

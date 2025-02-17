@@ -155,15 +155,19 @@ const Login: React.FC = () => {
         });
 
         const { token } = response.data;
+
+        // sessionStorage에 필요한 정보 저장
         sessionStorage.setItem('token', token);
-      sessionStorage.setItem('userId', loginInput.loginId);
+        sessionStorage.setItem('userId', response.data.username || loginInput.loginId); // username이 있으면 사용, 없으면 loginId 사용
+        sessionStorage.setItem('loginId', loginInput.loginId); // loginId 추가 저장
 
         Axiosbase.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         navigate('/project');
 
       } catch (error: any) {
-        // ... (error handling)
+        setError(error.response?.data?.message || '로그인에 실패했습니다.');
+        console.error('로그인 에러:', error);
       } finally {
         setIsLoading(false);
       }
@@ -185,7 +189,7 @@ const Login: React.FC = () => {
           <h2>로그인</h2>
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="loginID">아이디</label>
+
               <input
                 type="text"
                 id="loginId"

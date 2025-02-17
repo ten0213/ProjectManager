@@ -13,7 +13,35 @@ interface Project {
   date: string;
   projectCreator: string;
 }
+interface Project {
+  id: number;
+  projectName: string;
+  description: string;
+  isPrivate: boolean;
+  date: string;
+  projectCreator: string;
+}
 
+interface UserInfo {
+  username: string;
+  loginId: string;
+}
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #333;
+  font-size: 0.9rem;
+`;
+
+const CreatorInfo = styled.div`
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
 
 const DashboardContainer = styled.div`
   background-color: #f5f6f8;
@@ -26,17 +54,7 @@ const ContentContainer = styled.div`
   margin: 0 auto;
 `;
 
-const Headerr = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
 
-  h1 {
-    font-size: 2rem;
-    color: #333;
-  }
-`;
 
 const ProjectGrid = styled.div`
   display: grid;
@@ -117,27 +135,41 @@ const PrivacyBadge = styled.span<PrivacyBadgeProps>`
 
 const Dashboard: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();  // useNavigate 훅 사용
-
+  const navigate = useNavigate();
   const userId = sessionStorage.getItem('userId') || '';
 
   useEffect(() => {
-    // 세션 체크 추가
     const checkSession = () => {
       const token = sessionStorage.getItem('token');
       if (!token) {
-        navigate('/login');  // navigate 함수 사용
+        navigate('/login');
       }
     };
 
     checkSession();
     fetchProjects();
-  }, [navigate]);  // navigate를 의존성 배열에 추
+    fetchUserInfo();
+  }, [navigate]);
 
+  const fetchUserInfo = async () => {
+    const token = sessionStorage.getItem('token');
+    if (!token) return;
 
+    try {
+      const response = await Axiosbase.get('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setUserInfo(response.data);
+    } catch (err) {
+      console.error('사용자 정보 로딩 에러:', err);
+    }
+  };
   const fetchProjects = async () => {
     const token = sessionStorage.getItem('token');
     if (!token) {
@@ -192,36 +224,45 @@ const Dashboard: React.FC = () => {
 
   return (
     <DashboardContainer>
-    <Header userId={userId} />
-    <ContentContainer>
-      <DashboardHeader>
-        <h1>내 프로젝트</h1>
-        <div>
-          <Link to="/createProject">
-            <button>새 프로젝트 생성</button>
-          </Link>
-          <button><Logout /></button>
-        </div>
-      </DashboardHeader>
-      <ProjectGrid>
-        {projects.map((project) => (
-          <Link to={`/projectdetail/${project.id}`} key={project.id}>
-            <ProjectCard>
-              <DeleteButton
-                onClick={(e) => handleDelete(project.id, e)}
-                aria-label="프로젝트 삭제"
-              >
-                삭제
-              </DeleteButton>
-              <ProjectTitle>{project.projectName}</ProjectTitle>
-              <ProjectDescription>{project.description}</ProjectDescription>
-              <PrivacyBadge isPrivate={project.isPrivate}>
-                {project.isPrivate ? '비공개' : '공개'}
-              </PrivacyBadge>
-            </ProjectCard>
-          </Link>
-        ))}
-      </ProjectGrid>
+      <Header userId={userInfo?.username || userId} />
+      <ContentContainer>
+        <DashboardHeader>
+          <div>
+            <h1>내 프로젝트</h1>
+            {userInfo && (
+              <UserInfo>
+                <span>사용자: {userInfo.username}</span>
+                <span>아이디: {userInfo.loginId}</span>
+              </UserInfo>
+            )}
+          </div>
+          <div>
+            <Link to="/createProject">
+              <button>새 프로젝트 생성</button>
+            </Link>
+            <button><Logout /></button>
+          </div>
+        </DashboardHeader>
+        <ProjectGrid>
+          {projects.map((project) => (
+            <Link to={`/projectdetail/${project.id}`} key={project.id}>
+              <ProjectCard>
+                <DeleteButton
+                  onClick={(e) => handleDelete(project.id, e)}
+                  aria-label="프로젝트 삭제"
+                >
+                  삭제
+                </DeleteButton>
+                <ProjectTitle>{project.projectName}</ProjectTitle>
+                <ProjectDescription>{project.description}</ProjectDescription>
+                <PrivacyBadge isPrivate={project.isPrivate}>
+                  {project.isPrivate ? '비공개' : '공개'}
+                </PrivacyBadge>
+             
+              </ProjectCard>
+            </Link>
+          ))}
+        </ProjectGrid>
       </ContentContainer>
     </DashboardContainer>
   );

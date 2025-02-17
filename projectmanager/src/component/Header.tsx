@@ -1,103 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const HeaderContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-`;
-
-const ProfileSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const ProfileAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  background-color: #1a73e8;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 500;
-`;
-
-const ProfileInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const UserName = styled.span`
-  font-weight: 500;
-  color: #333;
-`;
-
-const UserRole = styled.span`
-  font-size: 0.8rem;
-  color: #666;
-`;
+import '../scss/Header.scss';
 
 interface HeaderProps {
   userId?: string;
 }
 
 const Header: React.FC<HeaderProps> = () => {
-  const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const navigate = useNavigate();
+  const popupRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
+
+  // sessionStorage에서 username(기존 userId)과 loginId 가져오기
+  const username = sessionStorage.getItem('userId') || ''; // 기존 userId를 username으로 사용
+  const loginId = sessionStorage.getItem('loginId') || username; // loginId가 없다면 username과 동일하게 설정
 
   useEffect(() => {
     const checkUserSession = () => {
-      const storedUserId = sessionStorage.getItem('userId');
-      if (!storedUserId) {
+      if (!username) {
         navigate('/login');
         return;
       }
-      setCurrentUserId(storedUserId);
     };
 
     checkUserSession();
+  }, [navigate, username]);
 
-    // 세션 스토리지 변경 감지
-    const handleStorageChange = () => {
-      checkUserSession();
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node) &&
+        !avatarRef.current?.contains(event.target as Node)
+      ) {
+        setIsPopupOpen(false);
+      }
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [navigate]);
+  }, []);
 
   const getInitials = (name: string) => {
     return name.charAt(0).toUpperCase();
   };
 
-  if (!currentUserId) {
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate('/');
+  };
+
+  if (!username) {
     return null;
   }
 
   return (
-    <HeaderContainer>
-      <ProfileSection>
-        <ProfileAvatar>
-          {getInitials(currentUserId)}
-        </ProfileAvatar>
-        <ProfileInfo>
-          <UserName>{currentUserId}</UserName>
-          <UserRole>로그인된 사용자</UserRole>
-        </ProfileInfo>
-      </ProfileSection>
-    </HeaderContainer>
+    <div className="header-container">
+      <div className="profile-section">
+        <div
+          ref={avatarRef}
+          className="profile-avatar"
+          onClick={() => setIsPopupOpen(!isPopupOpen)}
+        >
+          {getInitials(username)}
+        </div>
+        <div className="profile-info">
+          <span className="user-name">{username}</span>
+          <span className="user-role">로그인된 사용자</span>
+        </div>
+
+        <div ref={popupRef} className={`profile-popup ${isPopupOpen ? 'active' : ''}`}>
+          <div className="popup-header">
+            <div className="profile-info-extended">
+              <div className="popup-avatar">
+                {getInitials(username)}
+              </div>
+              <div className="info">
+                <div className="name">{username}</div>
+                <div className="role">로그인된 사용자</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="popup-content">
+            {/* <div className="menu-item">
+              사용자 이름: {username}
+            </div> */}
+            <div className="menu-item">
+              로그인 ID: {loginId}
+            </div>
+          </div>
+
+          <div className="popup-footer">
+            <button className="logout-button" onClick={handleLogout}>
+              로그아웃
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
