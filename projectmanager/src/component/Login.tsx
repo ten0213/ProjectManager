@@ -155,22 +155,20 @@ const Login: React.FC = () => {
         });
 
         const { token } = response.data;
-        localStorage.setItem('token', token);
+        sessionStorage.setItem('token', token);
+      sessionStorage.setItem('userId', loginInput.loginId);
 
         Axiosbase.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         navigate('/project');
 
       } catch (error: any) {
-        if (error.response?.status === 401) {
-          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
-        } else {
-          setError(error.response?.data?.message || '로그인 중 오류가 발생했습니다.');
-        }
+        // ... (error handling)
       } finally {
         setIsLoading(false);
       }
     };
+
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;

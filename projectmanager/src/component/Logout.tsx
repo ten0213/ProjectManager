@@ -38,14 +38,12 @@ const Logout: React.FC = () => {
                 }
               });
 
-              // 로컬 스토리지의 토큰 제거
-              localStorage.removeItem('token');
-
-              // Axios 헤더에서 토큰 제거
-              delete Axiosbase.defaults.headers.common['Authorization'];
+              sessionStorage.removeItem('token');
+    sessionStorage.removeItem('userId');
+    delete Axiosbase.defaults.headers.common['Authorization'];
 
               // 로그인 페이지로 리다이렉트
-              navigate('/');
+              navigate('/login');
 
       // 백엔드 로그아웃 API 호출
             }

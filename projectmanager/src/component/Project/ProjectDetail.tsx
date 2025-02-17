@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Axiosbase from '../../Axiosbase.tsx';
+import Header from '../Header.tsx';
 const InviteSection = styled.div`
   margin-top: 2rem;
   padding: 1.5rem;
@@ -20,6 +21,11 @@ const InviteInput = styled.input`
     background-color: #e9ecef;
   }
 `;
+const PageContainer = styled.div`
+  background-color: #f5f6f8;
+  min-height: 100vh;
+`;
+
 
 const InviteButton = styled.button`
   padding: 0.5rem 1rem;
@@ -91,7 +97,7 @@ const DetailContainer = styled.div`
   margin: 0 auto;
 `;
 
-const Header = styled.div`
+const Headerr = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -344,15 +350,19 @@ const [isInviting, setIsInviting] = useState(false);
     }
   };
 
+  const userId = localStorage.getItem('userId') || '';
+
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>{error}</div>;
   if (!project) return <div>프로젝트를 찾을 수 없습니다.</div>;
   localStorage.setItem('id', `${id}`);
   return (
+    <PageContainer>
+    <Header userId={userId} />
     <DetailContainer>
-      <Header>
+      <Headerr>
         <h1>Document</h1>
-      </Header>
+      </Headerr>
       <DetailCard>
         <ProjectTitle>{project.projectName}</ProjectTitle>
         <PrivacyBadge $isPrivate={project.isPrivate}>
@@ -450,6 +460,7 @@ const [isInviting, setIsInviting] = useState(false);
         </ButtonGroup>
       </DetailCard>
     </DetailContainer>
+    </PageContainer>
   );
 };
 

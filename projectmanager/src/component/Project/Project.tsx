@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Axiosbase from '../../Axiosbase.tsx';
 import Logout from '../Logout.tsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';  // useNavigate 추가
+import Header from '../Header.tsx';
 
 interface Project {
   id: number;
@@ -13,13 +14,19 @@ interface Project {
   projectCreator: string;
 }
 
+
 const DashboardContainer = styled.div`
+  background-color: #f5f6f8;
+  min-height: 100vh;
+`;
+
+const ContentContainer = styled.div`
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
 `;
 
-const Header = styled.div`
+const Headerr = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -83,6 +90,17 @@ const ProjectDescription = styled.p`
   margin-bottom: 1rem;
   font-size: 0.9rem;
 `;
+const DashboardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    color: #333;
+  }
+`;
 
 interface PrivacyBadgeProps {
   isPrivate: boolean;
@@ -102,9 +120,23 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate();  // useNavigate 훅 사용
+
+  const userId = sessionStorage.getItem('userId') || '';
+
   useEffect(() => {
+    // 세션 체크 추가
+    const checkSession = () => {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');  // navigate 함수 사용
+      }
+    };
+
+    checkSession();
     fetchProjects();
-  }, []);
+  }, [navigate]);  // navigate를 의존성 배열에 추
+
 
   const fetchProjects = async () => {
     try {
@@ -137,7 +169,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <DashboardContainer>
-      <Header>
+    <Header userId={userId} />
+    <ContentContainer>
+      <DashboardHeader>
         <h1>내 프로젝트</h1>
         <div>
           <Link to="/createProject">
@@ -145,7 +179,7 @@ const Dashboard: React.FC = () => {
           </Link>
           <button><Logout /></button>
         </div>
-      </Header>
+      </DashboardHeader>
       <ProjectGrid>
         {projects.map((project) => (
           <Link to={`/projectdetail/${project.id}`} key={project.id}>
@@ -165,6 +199,7 @@ const Dashboard: React.FC = () => {
           </Link>
         ))}
       </ProjectGrid>
+      </ContentContainer>
     </DashboardContainer>
   );
 };
