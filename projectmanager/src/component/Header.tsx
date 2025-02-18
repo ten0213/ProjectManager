@@ -49,7 +49,10 @@ const Header: React.FC<HeaderProps> = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.clear();
+    if (window.confirm('로그아웃 하시겠습니까?')) {
+      sessionStorage.clear();
+
+    }
     navigate('/');
   };
 

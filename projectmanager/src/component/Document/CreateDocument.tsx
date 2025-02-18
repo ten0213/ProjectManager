@@ -341,7 +341,7 @@ const CreateDocument: React.FC = () => {
       console.log("Submitting request with projectId:", formData.projectId);
       console.log("Request Data:", JSON.stringify(requestData, null, 2));
 
-      const response = await Axiosbase.post(
+       await Axiosbase.post(
         "/api/document/create",
         requestData
       );

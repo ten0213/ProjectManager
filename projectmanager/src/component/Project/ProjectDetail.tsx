@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
 import Axiosbase from "../../Axiosbase.tsx";
@@ -268,7 +268,7 @@ const Button = styled.button`
 `;
 
 const ProjectDetail: React.FC = () => {
-  var { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -283,20 +283,16 @@ const ProjectDetail: React.FC = () => {
   } | null>(null);
   const [isInviting, setIsInviting] = useState(false);
 
-  useEffect(() => {
-    Promise.all([fetchProjectDetail(), fetchDocuments()]).finally(() =>
-      setLoading(false)
-    );
-  }, [id]);
 
-  const fetchProjectDetail = async () => {
+  const fetchProjectDetail = useCallback(async () => {
+    if (!id) return;
     try {
       const response = await Axiosbase.get(`/api/project/read/${id}`);
       setProject(response.data);
     } catch (err) {
       setError("프로젝트 정보를 불러오는데 실패했습니다.");
     }
-  };
+  }, [id]);
   const handleInvite = async () => {
     if (!username.trim()) {
       setInviteMessage({ type: "error", text: "사용자 이름을 입력해주세요." });
@@ -345,13 +341,11 @@ const ProjectDetail: React.FC = () => {
     }
   };
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
+    if (!id) return;
     try {
-      // 이전: /api/document/read/project/${id}
-      // 수정: /api/document/project/${id}
       const response = await Axiosbase.get(`/api/document/project/${id}`);
       if (response.data) {
-        // 날짜 기준으로 내림차순 정렬 (최신 문서가 위로)
         const sortedDocuments = response.data.sort(
           (a: Document, b: Document) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -364,7 +358,13 @@ const ProjectDetail: React.FC = () => {
       console.error("문서 로드 에러:", err);
       setError("문서 목록을 불러오는데 실패했습니다.");
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    Promise.all([fetchProjectDetail(), fetchDocuments()]).finally(() =>
+      setLoading(false)
+    );
+  }, [fetchProjectDetail, fetchDocuments]);
 
   const userId = sessionStorage.getItem("userId") || "";
 
@@ -434,6 +434,7 @@ const ProjectDetail: React.FC = () => {
             day: "numeric",
           })}
         </DateBadge>
+
         {doc.endpoints.map((endpoint, endpointIndex) => (
           <EndpointInfo key={endpointIndex}>
             <div>
