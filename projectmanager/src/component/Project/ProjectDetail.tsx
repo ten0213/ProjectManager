@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
 import Axiosbase from "../../Axiosbase.tsx";
 import Header from "../Header.tsx";
+
+
 const InviteSection = styled.div`
   margin-top: 2rem;
   padding: 1.5rem;
@@ -73,12 +75,14 @@ interface Document {
   id: number;
   date: string;
   endpoints: Endpoint[];
+  creator: string;  // 작성자 필드 추가
 }
 
 interface Endpoint {
   path: string;
   method: string;
   parameters: Parameter[];
+
 }
 
 interface Parameter {
@@ -86,7 +90,17 @@ interface Parameter {
   type: string;
   data: string;
 }
-
+const CreatorBadge = styled.div`
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background-color: #f5f5f5;
+  color: #666;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+`;
 const DetailContainer = styled.div`
   padding: 2rem;
   max-width: 800px;
@@ -366,7 +380,7 @@ const ProjectDetail: React.FC = () => {
     );
   }, [fetchProjectDetail, fetchDocuments]);
 
-  const userId = sessionStorage.getItem("userId") || "";
+  var userId = sessionStorage.getItem("userId") || "";
 
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>{error}</div>;
@@ -426,41 +440,19 @@ const ProjectDetail: React.FC = () => {
   documents.map((doc, index) => (
     <Link to={`/document/${doc.id}`} key={doc.id || index} style={{ textDecoration: 'none' }}>
       <DocumentCard>
-        <DateBadge>
-          작성일:{" "}
-          {new Date(doc.date).toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </DateBadge>
-
-        {doc.endpoints.map((endpoint, endpointIndex) => (
-          <EndpointInfo key={endpointIndex}>
-            <div>
-              <MethodBadge method={endpoint.method}>
-                {endpoint.method.toUpperCase()}
-              </MethodBadge>
-              <PathText>{endpoint.path}</PathText>
-            </div>
-            <ParameterList>
-              {endpoint.parameters.map((param, paramIndex) => (
-                <ParameterItem key={paramIndex}>
-                  <span style={{ fontWeight: 500 }}>
-                    {param.annotation}
-                  </span>{" "}
-                  <br />
-                  type:{" "}
-                  <span style={{ color: "#6c757d" }}>
-                    {param.type}
-                  </span>
-                  <br />
-                  data: <span>{param.data}</span>
-                </ParameterItem>
-              ))}
-            </ParameterList>
-          </EndpointInfo>
-        ))}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+          <DateBadge>
+            작성일:{" "}
+            {new Date(doc.date).toLocaleDateString("ko-KR", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </DateBadge>
+          <CreatorBadge>
+            작성자: {userId}
+          </CreatorBadge>
+        </div>
       </DocumentCard>
     </Link>
   ))
