@@ -21,11 +21,12 @@ interface Document {
   projectId: number;
   endpoints: Endpoint[];
 }
-
 const Container = styled.div`
   max-width: 1000px;
   margin: 2rem auto;
   padding: 0 2rem;
+
+  border-radius: 16px;
 `;
 
 const Header = styled.div`
@@ -33,12 +34,21 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+
 `;
 
 const Title = styled.h1`
-  color: #333;
   font-size: 1.8rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
+
 
 const ButtonGroup = styled.div`
   display: flex;
@@ -46,109 +56,155 @@ const ButtonGroup = styled.div`
 `;
 
 const Button = styled.button`
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
 
   &.edit {
-    background-color: #2196f3;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
     &:hover {
-      background-color: #1976d2;
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
   }
 
   &.delete {
-    background-color: #f44336;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     &:hover {
-      background-color: #d32f2f;
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
   }
 
   &.back {
-    background-color: #757575;
-    color: white;
+    background: white;
+    color: #4f46e5;
+    border: 2px solid #e0e7ff;
     &:hover {
-      background-color: #616161;
+      background: #f5f7ff;
+      border-color: #818cf8;
+      transform: translateY(-1px);
     }
   }
 `;
 
 const EndpointCard = styled.div`
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
   margin-bottom: 2rem;
   overflow: hidden;
+  border: 1px solid #e8eeff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 28px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+  }
 `;
 
 const EndpointHeader = styled.div`
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 1.25rem;
+  background: linear-gradient(to right, #fafbff, #ffffff);
+  border-bottom: 2px solid #e0e7ff;
 `;
 
 const Method = styled.span<{ method: string }>`
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   font-weight: bold;
   margin-right: 1rem;
   font-size: 0.9rem;
+  transition: all 0.3s ease;
 
   ${({ method }) => {
     switch (method.toUpperCase()) {
       case 'GET':
-        return 'background-color: #e3f2fd; color: #1565c0;';
+        return 'background-color: #e0e7ff; color: #4f46e5; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);';
       case 'POST':
-        return 'background-color: #e8f5e9; color: #2e7d32;';
+        return 'background-color: #dcfce7; color: #16a34a; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);';
       case 'PUT':
-        return 'background-color: #fff3e0; color: #f57c00;';
+        return 'background-color: #fff7ed; color: #ea580c; box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15);';
       case 'DELETE':
-        return 'background-color: #ffebee; color: #c62828;';
+        return 'background-color: #fee2e2; color: #dc2626; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);';
       default:
-        return 'background-color: #f5f5f5; color: #616161;';
+        return 'background-color: #f3f4f6; color: #4b5563; box-shadow: 0 2px 8px rgba(75, 85, 99, 0.15);';
     }
   }}
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 `;
 
 const Path = styled.span`
-  font-family: monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 1rem;
-  color: #333;
+  color: #4f46e5;
+  padding: 0.5rem 0.75rem;
+  background: #f8faff;
+  border-radius: 4px;
+  border: 1px solid #e0e7ff;
 `;
 
 const ParameterSection = styled.div`
-  padding: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(to right, #fafbff, #ffffff);
 `;
 
 const ParameterTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
 
   th, td {
-    padding: 0.75rem;
+    padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e7ff;
   }
 
   th {
-    background-color: #f5f5f5;
-    font-weight: 500;
-    color: #666;
+    background: linear-gradient(135deg, #6366f1 0%, #1a73e8 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+  }
+
+  tr:hover {
+    background-color: #f8faff;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
   }
 `;
 
 const CreatedDate = styled.div`
-  color: #666;
+  color: #6b7280;
   font-size: 0.9rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: #f8faff;
+  border-radius: 4px;
+  border: 1px solid #e0e7ff;
+  display: inline-block;
 `;
 
 const DocumentDetail: React.FC = () => {

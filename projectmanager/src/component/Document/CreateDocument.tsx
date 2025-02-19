@@ -25,129 +25,168 @@ const FormContainer = styled.div`
   padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
+  background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
+  border-radius: 16px;
 `;
 
 const Form = styled.form`
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;  // 패딩 감소
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+  border: 1px solid #e8eeff;
+  margin-top: 2rem;
+
+  min-width: 300px;  // 최소 너비 설정
+  position: relative;
+
 `;
 
 const FormGroup = styled.div`
   margin-bottom: 1.5rem;
+  position: relative;
 `;
 
 const Label = styled.label`
   display: block;
   margin-bottom: 0.5rem;
-  color: #333;
-  font-weight: 500;
+  color: #4f46e5;
+  font-weight: 600;
+  transition: color 0.3s ease;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 2px solid #e0e7ff;
+  border-radius: 8px;
   font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fafbff;
 
   &:focus {
     outline: none;
-    border-color: #2196f3;
+    border-color: #818cf8;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    background-color: white;
+  }
+
+  &:hover {
+    border-color: #a5b4fc;
+    background-color: white;
   }
 `;
 
 const EndpointContainer = styled.div`
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  border: 2px solid #e0e7ff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #fafbff, #ffffff);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+
+  &:hover {
+    border-color: #818cf8;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+    transform: translateY(-1px);
+  }
 `;
 
 const ParameterContainer = styled.div`
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: #f8faff;
+  border-radius: 8px;
+  border: 1px solid #e0e7ff;
+  border-left: 4px solid #818cf8;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 `;
-
 const ActionButton = styled.button`
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
 
-  &.parameter-add {
-    background-color: #4caf50;
+  &.parameter-add, &.endpoint-add {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
     &:hover {
-      background-color: #388e3c;
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
   }
 
-  &.parameter-remove {
-    background-color: #f44336;
+  &.parameter-remove, &.endpoint-remove {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     &:hover {
-      background-color: #d32f2f;
-    }
-  }
-
-  &.endpoint-add {
-    background-color: #4caf50;
-    color: white;
-    &:hover {
-      background-color: #388e3c;
-    }
-  }
-
-  &.endpoint-remove {
-    background-color: #f44336;
-    color: white;
-    &:hover {
-      background-color: #d32f2f;
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
   }
 `;
 
 const SubmitButton = styled.button`
-  padding: 0.5rem 2rem;
-  border-radius: 4px;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  background-color: #2196f3;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+
   &:hover {
-    background-color: #1976d2;
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
   }
 `;
 
 const CancelButton = styled.button`
-  padding: 0.5rem 2rem;
-  border-radius: 4px;
-  border: none;
-  font-weight: 500;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  border: 2px solid #e0e7ff;
+  font-weight: 600;
   cursor: pointer;
-  background-color: #f5f5f5;
-  color: #333;
+  background: white;
+  color: #4f46e5;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+
   &:hover {
-    background-color: #e0e0e0;
+    background-color: #f5f7ff;
+    border-color: #818cf8;
+    transform: translateY(-1px);
   }
 `;
 
 const ErrorMessage = styled.div`
-  color: #f44336;
+  color: #ef4444;
   font-size: 0.875rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border-radius: 6px;
+  border-left: 4px solid #ef4444;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
 `;
-
 const CreateDocument: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
