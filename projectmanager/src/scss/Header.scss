@@ -1,146 +1,148 @@
 .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
+  display: flex;
+  justify-content: flex-end;  /* Changed from space-between to flex-end */
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-  .profile-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    position: relative;
-  }
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
 
-  .profile-avatar {
-    width: 40px;
-    height: 40px;
-    background-color: #1a73e8;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #1a73e8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
-    &:hover {
-      background-color: darken(#1a73e8, 5%);
-    }
-  }
+.profile-avatar:hover {
+  background-color: #1557b0;  /* Darkened #1a73e8 */
+}
 
-  .profile-info {
-    display: flex;
-    flex-direction: column;
-  }
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
 
-  .user-name {
-    font-weight: 500;
-    color: #333;
-  }
+.user-name {
+  font-weight: 500;
+  color: #333;
+}
 
-  .user-role {
-    font-size: 0.8rem;
-    color: #666;
-  }
+.user-role {
+  font-size: 0.8rem;
+  color: #666;
+}
 
-  .profile-popup {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: -145px;
-    width: 300px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+.profile-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;  /* Changed from -145px to 0 to align with the profile */
+  width: 300px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
 
-    &.active {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
+.profile-popup.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
 
-    .popup-header {
-      padding: 16px;
-      border-bottom: 1px solid #eee;
+.popup-header {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
 
-      .profile-info-extended {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+.popup-header .profile-info-extended {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-        .popup-avatar {
-          width: 48px;
-          height: 48px;
-          background-color: #1a73e8;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: 500;
-        }
+.popup-header .profile-info-extended .popup-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: #1a73e8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+}
 
-        .info {
-          flex: 1;
-          .name {
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 4px;
-          }
-          .role {
-            font-size: 0.8rem;
-            color: #666;
-          }
-        }
-      }
-    }
+.popup-header .profile-info-extended .info {
+  flex: 1;
+}
 
-    .popup-content {
-      padding: 8px 0;
+.popup-header .profile-info-extended .info .name {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
 
-      .menu-item {
-        padding: 12px 16px;
-        display: flex;
-        align-items: center;
-        color: #333;
-        text-decoration: none;
-        transition: background-color 0.2s;
-        cursor: pointer;
+.popup-header .profile-info-extended .info .role {
+  font-size: 0.8rem;
+  color: #666;
+}
 
-        &:hover {
-          background-color: #f5f5f5;
-        }
-      }
-    }
+.popup-content {
+  padding: 8px 0;
+}
 
-    .popup-footer {
-      padding: 8px 0;
-      border-top: 1px solid #eee;
+.popup-content .menu-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
 
-      .logout-button {
-        width: 100%;
-        padding: 12px 16px;
-        text-align: left;
-        border: none;
-        background: none;
-        color: #333;
-        cursor: pointer;
-        transition: background-color 0.2s;
+.popup-content .menu-item:hover {
+  background-color: #f5f5f5;
+}
 
-        &:hover {
-          background-color: #f5f5f5;
-        }
-      }
-    }
-  }
+.popup-footer {
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+}
+
+.popup-footer .logout-button {
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.popup-footer .logout-button:hover {
+  background-color: #f5f5f5;
+}
