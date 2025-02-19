@@ -4,7 +4,6 @@ import styled from "styled-components";
 import Axiosbase from "../../Axiosbase.tsx";
 import Header from "../Header.tsx";
 
-
 const InviteSection = styled.div`
   margin-top: 2rem;
   padding: 1.5rem;
@@ -75,14 +74,13 @@ interface Document {
   id: number;
   date: string;
   endpoints: Endpoint[];
-  creator: string;  // 작성자 필드 추가
+  creator: string; // 작성자 필드 추가
 }
 
 interface Endpoint {
   path: string;
   method: string;
   parameters: Parameter[];
-
 }
 
 interface Parameter {
@@ -297,7 +295,6 @@ const ProjectDetail: React.FC = () => {
   } | null>(null);
   const [isInviting, setIsInviting] = useState(false);
 
-
   const fetchProjectDetail = useCallback(async () => {
     if (!id) return;
     try {
@@ -408,7 +405,6 @@ const ProjectDetail: React.FC = () => {
               {showInvite ? "초대 닫기" : "사용자 초대"}
             </Button>
           </ButtonGroup>
-
           {showInvite && (
             <InviteSection>
               <SectionTitle>사용자 초대</SectionTitle>
@@ -430,24 +426,27 @@ const ProjectDetail: React.FC = () => {
                 </MessageBox>
               )}
             </InviteSection>
-          )}
-
-
-            {" "}
-            <DocumentSection>
-              <SectionTitle>API 문서 목록</SectionTitle>
-              {documents.length > 0 ? (
+          )}{" "}
+          <DocumentSection>
+            <SectionTitle>API 문서 목록</SectionTitle>
+            {documents.length > 0 ? (
   documents.map((doc, index) => (
     <Link to={`/document/${doc.id}`} key={doc.id || index} style={{ textDecoration: 'none' }}>
       <DocumentCard>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
           <DateBadge>
             작성일:{" "}
-            {new Date(doc.date).toLocaleDateString("ko-KR", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {(() => {
+              const date = new Date(doc.date);
+              const year = date.getFullYear();
+              const month = date.getMonth() + 1;
+              const day = date.getDate();
+              const hours = (date.getHours() + 9) % 24; // 한국 시간으로 조정하고 24시간 형식 유지
+              const minutes = date.getMinutes();
+              const seconds = date.getSeconds();
+
+              return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분 ${seconds}초`;
+            })()}
           </DateBadge>
           <CreatorBadge>
             작성자: {userId}
@@ -470,9 +469,7 @@ const ProjectDetail: React.FC = () => {
     </p>
   </div>
 )}
-            </DocumentSection>
-
-
+          </DocumentSection>
           <ButtonGroup>
             <Button
               className="edit"
