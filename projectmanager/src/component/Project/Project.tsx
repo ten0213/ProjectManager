@@ -159,16 +159,6 @@ const Dashboard: React.FC = () => {
     const token = sessionStorage.getItem('token');
     if (!token) return;
 
-    try {
-      const response = await Axiosbase.get('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setUserInfo(response.data);
-    } catch (err) {
-      console.error('사용자 정보 로딩 에러:', err);
-    }
   };
   const fetchProjects = async () => {
     const token = sessionStorage.getItem('token');
@@ -258,7 +248,7 @@ const Dashboard: React.FC = () => {
                 <PrivacyBadge isPrivate={project.isPrivate}>
                   {project.isPrivate ? '비공개' : '공개'}
                 </PrivacyBadge>
-             
+
               </ProjectCard>
             </Link>
           ))}
