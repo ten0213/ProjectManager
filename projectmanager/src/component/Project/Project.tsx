@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
     checkSession();
     fetchProjects();
     fetchUserInfo();
-  }, [navigate]);
+  }, []);
 
   const fetchUserInfo = async () => {
     const token = sessionStorage.getItem('token');
