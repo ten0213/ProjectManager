@@ -7,7 +7,6 @@ interface DocumentRequest {
   date: string;
   projectId: number;
   endpoints: EndpointRequest[];
-  creator: string;  // 작성자 필드 추가
 }
 
 interface EndpointRequest {
@@ -194,25 +193,23 @@ const CreateDocument: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [previousDocument, setPreviousDocument] =
     useState<DocumentRequest | null>(null);
-    const userId = sessionStorage.getItem('userId') || '';
-    const [formData, setFormData] = useState<DocumentRequest>({
-      date: new Date().toISOString(),
-      projectId: 0,
-      creator: userId,  // 작성자 정보 추가
-      endpoints: [
-        {
-          path: "",
-          method: "",
-          parameters: [
-            {
-              annotation: "",
-              type: "",
-              data: "",
-            },
-          ],
-        },
-      ],
-    });
+  const [formData, setFormData] = useState<DocumentRequest>({
+    date: new Date().toISOString(),
+    projectId: 0,
+    endpoints: [
+      {
+        path: "",
+        method: "",
+        parameters: [
+          {
+            annotation: "",
+            type: "",
+            data: "",
+          },
+        ],
+      },
+    ],
+  });
 
   useEffect(() => {
     const fetchLastDocument = async () => {
@@ -289,9 +286,7 @@ const CreateDocument: React.FC = () => {
       ),
     }));
   };
-  const handleCancel = () => {
-    navigate(`/projectdetail/${formData.projectId}`);
-  };
+
   const addEndpoint = () => {
     setFormData((prev) => ({
       ...prev,
@@ -368,16 +363,9 @@ const CreateDocument: React.FC = () => {
         return;
       }
 
-      if (!userId) {
-        setError("사용자 정보가 필요합니다.");
-        navigate('/login');
-        return;
-      }
-
       const requestData: DocumentRequest = {
         date: formData.date,
         projectId: formData.projectId,
-        creator: userId,  // 현재 로그인한 사용자 ID 포함
         endpoints: formData.endpoints.map((endpoint) => ({
           path: endpoint.path || "",
           method: endpoint.method || "",
@@ -392,15 +380,22 @@ const CreateDocument: React.FC = () => {
       console.log("Submitting request with projectId:", formData.projectId);
       console.log("Request Data:", JSON.stringify(requestData, null, 2));
 
-      await Axiosbase.post("/api/document/create", requestData);
-      const projectId = sessionStorage.getItem('id');
-      navigate(`/projectdetail/${projectId}`);
-
+       await Axiosbase.post(
+        "/api/document/create",
+        requestData
+      );
+      const $id = sessionStorage.getItem('id');
+      window.location.href = `/projectdetail/${$id}`;
     } catch (err: any) {
       console.error("Error:", err);
       setError(err.response?.data?.message || "API 문서 생성에 실패했습니다.");
     }
   };
+
+  const handleCancel = () => {
+    navigate(`/projectdetail/${formData.projectId}`);
+  };
+
   return (
     <FormContainer>
       {formData.endpoints.map((endpoint, endpointIndex) => (
