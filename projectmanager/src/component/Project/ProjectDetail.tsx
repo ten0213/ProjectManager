@@ -75,7 +75,7 @@ interface Document {
   id: number;
   date: string;
   endpoints: Endpoint[];
-  creator: string;  // 작성자 필드 추가
+  writer: string;  // 기존의 creator -> writer로 변경
 }
 
 interface Endpoint {
@@ -359,8 +359,12 @@ const ProjectDetail: React.FC = () => {
     if (!id) return;
     try {
       const response = await Axiosbase.get(`/api/document/project/${id}`);
-      if (response.data) {
-        const sortedDocuments = response.data.sort(
+      console.log("API 응답:", response.data);
+
+      const documentsData = response.data.data ?? response.data; // 응답 구조 대응
+
+      if (documentsData) {
+        const sortedDocuments = documentsData.sort(
           (a: Document, b: Document) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()
         );
@@ -373,7 +377,6 @@ const ProjectDetail: React.FC = () => {
       setError("문서 목록을 불러오는데 실패했습니다.");
     }
   }, [id]);
-
   useEffect(() => {
     Promise.all([fetchProjectDetail(), fetchDocuments()]).finally(() =>
       setLoading(false)
@@ -450,8 +453,8 @@ const ProjectDetail: React.FC = () => {
             })}
           </DateBadge>
           <CreatorBadge>
-            작성자: {userId}
-          </CreatorBadge>
+  작성자: {doc.writer ? doc.writer : "알 수 없음"}
+</CreatorBadge>
         </div>
       </DocumentCard>
     </Link>

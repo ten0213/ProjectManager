@@ -7,7 +7,7 @@ interface DocumentRequest {
   date: string;
   projectId: number;
   endpoints: EndpointRequest[];
-  creator: string;  // 작성자 필드 추가
+  writer: string;  // 작성자 필드 추가
 }
 
 interface EndpointRequest {
@@ -198,7 +198,7 @@ const CreateDocument: React.FC = () => {
     const [formData, setFormData] = useState<DocumentRequest>({
       date: new Date().toISOString(),
       projectId: 0,
-      creator: userId,  // 작성자 정보 추가
+      writer: userId,  // 작성자 정보 추가
       endpoints: [
         {
           path: "",
@@ -377,7 +377,7 @@ const CreateDocument: React.FC = () => {
       const requestData: DocumentRequest = {
         date: formData.date,
         projectId: formData.projectId,
-        creator: userId,  // 현재 로그인한 사용자 ID 포함
+        writer: userId,  // 현재 로그인한 사용자 ID 포함
         endpoints: formData.endpoints.map((endpoint) => ({
           path: endpoint.path || "",
           method: endpoint.method || "",
