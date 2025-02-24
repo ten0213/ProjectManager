@@ -67,9 +67,7 @@ interface Project {
   projectName: string;
 }
 
-interface MethodBadgeProps {
-  method: string;
-}
+
 
 interface Document {
   id: number;
@@ -135,13 +133,7 @@ const SectionTitle = styled.h3`
     border-radius: 2px;
   }
 `;
-const EndpointInfo = styled.div`
-  margin: 1rem 0;
-  padding: 1.2rem;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  border: 1px solid #eee;
-`;
+
 const DetailCard = styled.div`
   background: white;
   border-radius: 8px;
@@ -192,44 +184,33 @@ const DateBadge = styled.div`
   margin-bottom: 1rem;
 `;
 
-const MethodBadge = styled.span<MethodBadgeProps>`
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  margin-right: 1rem;
-  background-color: ${({ method }) => {
-    switch (method.toUpperCase()) {
-      case "GET":
-        return "#4caf50";
-      case "POST":
-        return "#2196f3";
-      case "PUT":
-        return "#ff9800";
-      case "DELETE":
-        return "#f44336";
-      default:
-        return "#757575";
-    }
-  }};
-  color: white;
-`;
+// const MethodBadge = styled.span<MethodBadgeProps>`
+//   padding: 0.4rem 0.8rem;
+//   border-radius: 4px;
+//   font-size: 0.85rem;
+//   font-weight: bold;
+//   margin-right: 1rem;
+//   background-color: ${({ method }) => {
+//     switch (method.toUpperCase()) {
+//       case "GET":
+//         return "#4caf50";
+//       case "POST":
+//         return "#2196f3";
+//       case "PUT":
+//         return "#ff9800";
+//       case "DELETE":
+//         return "#f44336";
+//       default:
+//         return "#757575";
+//     }
+//   }};
+//   color: white;
+// `;
 
-const PathText = styled.span`
-  font-family: monospace;
-  color: #333;
-`;
 
-const ParameterList = styled.div`
-  margin-left: 1rem;
-  padding: 0.5rem 0;
-`;
 
-const ParameterItem = styled.div`
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-  color: #666;
-`;
+
+
 interface PrivacyBadgeProps {
   $isPrivate: boolean;
 }
