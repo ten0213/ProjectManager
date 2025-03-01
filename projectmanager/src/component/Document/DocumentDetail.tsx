@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import Axiosbase from '../../Axiosbase.tsx';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import Axiosbase from "../../Axiosbase.tsx";
 
 interface Parameter {
   data: string;
@@ -20,6 +20,7 @@ interface Document {
   date: string;
   projectId: number;
   endpoints: Endpoint[];
+  writer: string;
 }
 const Container = styled.div`
   max-width: 1000px;
@@ -213,6 +214,8 @@ const DocumentDetail: React.FC = () => {
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInvited, setIsInvited] = useState(false);
+  const userId = sessionStorage.getItem("userId") || "";
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -220,8 +223,8 @@ const DocumentDetail: React.FC = () => {
         const response = await Axiosbase.get(`/api/document/read/${id}`);
         setDocument(response.data);
       } catch (err) {
-        console.error('Error fetching document:', err);
-        setError('문서를 불러오는데 실패했습니다.');
+        console.error("Error fetching document:", err);
+        setError("문서를 불러오는데 실패했습니다.");
       } finally {
         setLoading(false);
       }
@@ -249,18 +252,43 @@ const DocumentDetail: React.FC = () => {
   const handleBack = () => {
     navigate(-1);
   };
+// ✅ 초대 여부 확인
+useEffect(() => {
+  const checkInvitationStatus = async () => {
+    try {
+      const response = await Axiosbase.post(`/api/project/read/${document?.projectId}/invitations`, {
+        params: { userId },
+      });
 
-  if (loading) return <div>로딩중...</div>;
-  if (error) return <div>{error}</div>;
-  if (!document) return <div>문서를 찾을 수 없습니다.</div>;
+      if (response.status === 200) {
+        setIsInvited(response.data.isInvited ?? false);
+      } else {
+        setIsInvited(false);
+      }
+    } catch (err) {
+      console.error("초대 여부 확인 실패:", err);
+      setIsInvited(false);
+    }
+  };
 
+  if (document) {
+    checkInvitationStatus();
+  }
+}, [document, userId]);
+
+// ✅ 문서 데이터를 조건에 맞게 표시 (초대된 경우 공유, 초대되지 않은 경우 개별)
+const displayedDocument = isInvited ? document : { ...document, endpoints: [...(document?.endpoints || [])] };
+
+if (loading) return <div>로딩중...</div>;
+if (error) return <div>{error}</div>;
+if (!displayedDocument) return <div>문서를 찾을 수 없습니다.</div>;
   return (
     <Container>
       <Header>
         <div>
           <Title>API 문서 상세</Title>
           <CreatedDate>
-            작성일: {new Date(document.date).toLocaleDateString()}
+            작성일: {document?.date ? new Date(document.date).toLocaleDateString() : "N/A"}
           </CreatedDate>
         </div>
         <ButtonGroup>
@@ -269,7 +297,7 @@ const DocumentDetail: React.FC = () => {
         </ButtonGroup>
       </Header>
 
-      {document.endpoints.map((endpoint, index) => (
+      {displayedDocument.endpoints.map((endpoint, index) => (
         <EndpointCard key={index}>
           <EndpointHeader>
             <Method method={endpoint.method}>{endpoint.method.toUpperCase()}</Method>

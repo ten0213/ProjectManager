@@ -9,7 +9,13 @@ interface DocumentRequest {
   endpoints: EndpointRequest[];
   writer: string; // 작성자 필드 추가
 }
-
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  ownerId: string;
+  isInvited: boolean; // ✅ 초대 여부 필드 추가
+}
 interface EndpointRequest {
   path: string;
   method: string;
@@ -196,25 +202,64 @@ const CreateDocument: React.FC = () => {
   const [previousDocument, setPreviousDocument] =
     useState<DocumentRequest | null>(null);
   const userId = sessionStorage.getItem("userId") || "";
-  const [isInvited, setIsInvited] = useState(false);
+  const [isInvited] = useState(false);
+  const [, setProject] = useState<Project | null>(null);
+
+
   const [formData, setFormData] = useState<DocumentRequest>({
     date: new Date().toISOString(),
-    projectId: id ? parseInt(id) : 0, // id가 없을 경우 0을 기본값으로 설정
-    writer: userId, // 작성자 정보 추가
-    endpoints: [
-      {
-        path: "",
-        method: "",
-        parameters: [
-          {
-            annotation: "",
-            type: "",
-            data: "",
-          },
-        ],
-      },
-    ],
+    projectId: id ? parseInt(id) : 0,
+    writer: userId,
+    endpoints: [{ path: "", method: "", parameters: [{ annotation: "", type: "", data: "" }] }],
   });
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchProject = async () => {
+      try {
+        console.log("📢 프로젝트 정보 가져오기...");
+        const response = await Axiosbase.get(`/api/project/read/${id}`);
+        setProject(response.data);
+
+        // ✅ 초대된 경우 기존 문서를 불러오기
+        if (response.data.isInvited) {
+          fetchPreviousDocument();
+        }
+      } catch (err) {
+        console.warn("⚠️ 프로젝트 정보 가져오기 실패:", err);
+      }
+    };
+
+    const fetchPreviousDocument = async () => {
+      try {
+        console.log("📢 이전 문서 가져오기 요청 실행...");
+        const response = await Axiosbase.get("/api/document/read/exDocumentData");
+
+        if (response.data.writer === userId) {
+          console.log("이전 문서 가져오기 성공:", response.data);
+          setFormData((prev) => ({
+            ...prev,
+            endpoints: response.data.endpoints.map((endpoint) => ({
+              path: endpoint.path || "",
+              method: endpoint.method || "",
+              parameters: endpoint.parameters.map((param) => ({
+                annotation: param.annotation || "",
+                type: param.type || "",
+                data: param.data || "",
+              })),
+            })),
+          }));
+        }
+      } catch (err) {
+        console.warn("⚠️ 이전 문서 가져오기 실패:", err);
+      }
+    };
+
+    fetchProject();
+  }, [id, userId]);
+
+
+
    // ✅ 프로젝트 ID 유효성 검사
    useEffect(() => {
     if (!id || isNaN(parseInt(id))) {
@@ -228,36 +273,9 @@ const CreateDocument: React.FC = () => {
     }));
   }, [id]);
 
+   // ✅ 초대 여부 확인 (API 요청)
   // ✅ 초대 여부 확인 (API 요청)
-  useEffect(() => {
-    if (!id || isNaN(parseInt(id))) {
-      console.error("❌ 프로젝트 ID가 유효하지 않아 초대 여부를 확인할 수 없음.");
-      return;
-    }
 
-    const checkInvitationStatus = async () => {
-      try {
-
-
-        const response = await Axiosbase.post(`/api/project/read/${id}/invitations`, {
-          params: { userId },
-        });
-
-        if (response.status === 200) {
-          console.log("초대 여부 응답:", response.data);
-          setIsInvited(response.data.isInvited ?? false);
-        } else {
-          console.warn("초대 여부 응답 오류:", response);
-          setIsInvited(false);
-        }
-      } catch (err) {
-        console.error("초대 여부 확인 실패:", err);
-        setIsInvited(false);
-      }
-    };
-
-    checkInvitationStatus();
-  }, [id, userId]);
 
   // ✅ 기존 문서 가져오기 (초대된 경우에만 적용)
   useEffect(() => {
@@ -282,10 +300,10 @@ const CreateDocument: React.FC = () => {
     fetchLastDocument();
   }, [id, userId]);
 
-  // ✅ 초대 여부가 확인되면 `previousDocument` 데이터를 `formData`에 적용
+  // ✅ 기존 문서 데이터 적용
   useEffect(() => {
     if (isInvited && previousDocument) {
-      console.log("초대된 사용자 -> 기존 문서 공유 적용");
+      console.log("📢 초대된 사용자 -> 기존 문서 공유 적용");
       setFormData((prev) => ({
         ...prev,
         endpoints: previousDocument.endpoints.map((endpoint) => ({
@@ -405,28 +423,46 @@ const CreateDocument: React.FC = () => {
       }));
     }
   };
+  // ✅ 프로젝트 정보 가져오기 (필요할 경우)
+useEffect(() => {
+  if (!id) return;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fetchProject = async () => {
     try {
-      if (!formData.projectId) {
-        setError("프로젝트 ID가 필요합니다.");
-        return;
-      }
-
-      if (!userId) {
-        setError("사용자 정보가 필요합니다.");
-        navigate("/login");
-        return;
-      }
-
-      await Axiosbase.post("/api/document/create", formData);
-      navigate(`/projectdetail/${formData.projectId}`);
-    } catch (err: any) {
-      console.error("Error:", err);
-      setError(err.response?.data?.message || "API 문서 생성에 실패했습니다.");
+      console.log("📢 프로젝트 정보 가져오기...");
+      const response = await Axiosbase.get(`/api/project/read/${id}`);
+      console.log("프로젝트 정보:", response.data);
+    } catch (err) {
+      console.warn("⚠️ 프로젝트 정보 가져오기 실패:", err);
     }
   };
+
+  fetchProject();
+}, [id]);
+
+ // ✅ 문서 생성 요청
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    if (!formData.projectId) {
+      setError("프로젝트 ID가 필요합니다.");
+      return;
+    }
+
+    if (!userId) {
+      setError("사용자 정보가 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    // ✅ 엔드포인트 확인 후 요청
+    await Axiosbase.post("/api/document/create", formData);
+    navigate(`/projectdetail/${formData.projectId}`);
+  } catch (err: any) {
+    console.error("Error:", err);
+    setError(err.response?.data?.message || "API 문서 생성에 실패했습니다.");
+  }
+};
 
   return (
     <FormContainer>
